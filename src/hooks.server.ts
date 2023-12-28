@@ -18,15 +18,7 @@ const handle_user:Handle = async ({ event, resolve }) => {
 
 const handle_auth:Handle = async ({ event, resolve }) => {
   if (event.url.pathname.startsWith('/admin')) {
-    if (!event.locals.user.isAuthenticated) {
-      console.log('not authenticated');
-      return {
-        status: 302,
-        headers: {
-          location: '/login'
-        }
-      };
-    }
+    console.log('admin');
   }
 
   return resolve(event);

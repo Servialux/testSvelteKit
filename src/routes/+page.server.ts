@@ -13,7 +13,6 @@ export const load = async ({ locals }: ServerLoadEvent) => {
     fs.readdirSync(path.join('static/images/caroussel')).forEach((file) => {
         fileArray.push(`/images/caroussel/${file}`);
     });
-    console.log('sessiontest', fileArray);
     return {
         props: {
             session: session,

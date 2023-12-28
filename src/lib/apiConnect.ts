@@ -14,7 +14,6 @@ export const login = async (email: string, password: string) => {
             return response.data;
         }
         return true;
-        
     } catch (error: any){
         console.log(error);
         return false;
@@ -34,9 +33,52 @@ export const register = async (email: string, password: string) => {
     }
 }
 
-export function checkLife(cookie: string, refresh_toker: string){
-    axios.post(endpoint + 'api/checkLife', {
+export const checkLife = async (cookie: string) => {
+    try{
+        const res = await axios.get(endpoint + 'api/checklife', {
+            headers: {  
+                Authorization: `Bearer `+cookie,
+            },
+        })
+        return res;
+    }catch(error: any){
+        let response = {'code': 0,'message': ''};
+        console.log(response)
+        if(response.message){
+            response.code = error.response.data.statusCode;
+            response.message = error.response.data.data.message;
+        }
+        return response;
+    }
+}
+
+export function logout(cookie: string, refresh_toker: string){
+    axios.post(endpoint + 'api/logout', {
         cookie: cookie,
         refresh_token: refresh_toker,
     })
+}
+
+export const refreshToken = async (refresh_token: string) => {
+    try{
+        const response = await axios.post(endpoint + 'api/token/refresh', {
+            refresh_token: refresh_token,
+        })
+        return response;
+    }catch(error: any){
+        console.log(error.response.data);
+    }
+}
+
+export const getDetails = async (cookie: string, route: string) => {
+    try{
+        const response = await axios.get(endpoint + 'api/'+route, {
+            headers: {  
+                Authorization: `Bearer `+cookie,
+            },
+        })
+        return response;
+    }catch(error: any){
+       return error.response.data;
+    }
 }
