@@ -69,7 +69,7 @@ export const refreshToken = async (refresh_token: string) => {
         console.log(error.response.data);
     }
 }
-
+// Get API data
 export const getDetails = async (cookie: string, route: string) => {
     try{
         const response = await axios.get(endpoint + 'api/'+route, {
@@ -80,5 +80,20 @@ export const getDetails = async (cookie: string, route: string) => {
         return response;
     }catch(error: any){
        return error.response.data;
+    }
+}
+
+// Post API data
+export const postItem = async (cookie: string, route: string, data: any) => {
+    try{
+        const response = await axios.post(endpoint + 'api/'+route, data, {
+            headers: {  
+                Authorization: `Bearer `+cookie,
+            },
+        })
+        return response;
+    }
+    catch(error: any){
+        return error.response.data;
     }
 }

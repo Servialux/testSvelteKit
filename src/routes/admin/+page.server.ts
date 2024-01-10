@@ -1,7 +1,11 @@
-import { checkLife, getDetails, refreshToken } from "$lib/apiConnect";
+import { checkLife, getDetails, postItem, refreshToken } from "$lib/apiConnect";
 import { redirect } from "@sveltejs/kit";
+
 import type { ServerLoadEvent } from "@sveltejs/kit";
 
+export const actions = async () =>{
+	console.log('action');
+};
 
 export async function load({ locals, cookies }: ServerLoadEvent) {
     if (!locals.user) {
@@ -38,13 +42,19 @@ export async function load({ locals, cookies }: ServerLoadEvent) {
     }
     sessionInfo = result.data;
     dataSend = data.data;
-    
+    let formCreate = await getDetails(locals.user.token, 'admin/shops/form');
 
+    //Trigger from handleFormSubmit
+    function postDetails(data: any){
+        console.log('triggered');
+        //postItem(locals.user.token, 'admin/shops/form', data);
+    };
 
     return {
         props: {
             session: sessionInfo,
             data: dataSend,
+            formCreate: formCreate.data,
         }
     };
 }

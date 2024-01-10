@@ -1,6 +1,7 @@
 
 import type { Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
+import { postItem } from '$lib/apiConnect';
 
 const handle_user:Handle = async ({ event, resolve }) => {
     const session = event.cookies.get('session') ?? '';
@@ -23,5 +24,6 @@ const handle_auth:Handle = async ({ event, resolve }) => {
 
   return resolve(event);
 };
+
 
 export const handle = sequence(handle_user, handle_auth);

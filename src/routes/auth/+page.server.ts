@@ -11,11 +11,11 @@ export const actions: Actions = {
 		const password = data.get('password');
 
 		try{
+			if(typeof password !== 'string' || typeof email !== 'string'){return;};
 			const result = await login(email, password);
 			if(result){
 				console.log('cookie', result);
 				cookies.set('session', result.token, {
-					// send cookie for every page
 					path: '/',
 					httpOnly: true
 				});
@@ -42,7 +42,11 @@ export const actions: Actions = {
 			const email = data.get('email');
 			const password = data.get('password');
 			const repassword = data.get('repassword');
+			if(email === null || !password === null || !repassword === null){
+				throw new Error('Missing fields');
+			}
 			if(password === repassword){
+				if(typeof password !== 'string' || typeof email !== 'string'){return;};
 				const result = await register(email, password);
 			}
 		}catch (e){
