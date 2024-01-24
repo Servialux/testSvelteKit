@@ -26,21 +26,32 @@ import type { TableOfContents, TableSource,  } from "@skeletonlabs/skeleton";
 	};
 	async function handleFormSubmit(event: any) {
 		const postData = event.detail;
-		console.log('page', postData);
-		try {
-			const res = await fetch('/admin/function/', { 
-				method: 'POST', 
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify(postData)
-			});
-			const data = await res.json();
-			console.log(data);
-		} catch (error) {
-			console.error(error);
+		let bodyData = new FormData();
+		console.log('postData',postData);
+		for(let key in postData) {
+            if(key == 'logoFile' || key == 'imageFile') {
+                bodyData.append(key, postData[key], postData[key].name);
+            } else {
+                if(postData[key] === "1" || postData[key] === "0") {
+                    postData[key] = postData[key] === "0";
+                } else {
+                    postData[key] = postData[key];
+                }
+            }
+        }
+
+		bodyData.append("data", JSON.stringify(postData));
+			try {
+				const res = await fetch('/admin/function/', { 
+					method: 'POST', 
+					body: bodyData
+				});
+				const data = await res.json();
+				console.log('response page',data);
+			} catch (error) {
+				console.error(error);
+			}
 		}
-	}
 </script>
 
 	<div class="w-screen flex flex-col justify-center items-center p-2">

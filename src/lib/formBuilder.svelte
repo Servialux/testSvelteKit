@@ -2,7 +2,8 @@
     import { createEventDispatcher } from 'svelte';
     export let data: FormData = {} as FormData;
     const dispatch = createEventDispatcher();
-        // Interface pour chaque type de champ
+    
+    // Interface pour chaque type de champ
     interface FormField {
         title: string;
         fieldName: string;
@@ -24,6 +25,7 @@
     // Récupération des donnés du formulaire
 	function handleSubmit(event: Event) {
         event.preventDefault();
+        console.log(event.target);
         const formData = new FormData(event.target as HTMLFormElement);
         const data = Object.fromEntries(formData.entries());
         dispatch('submit', data);
@@ -31,7 +33,7 @@
 </script>
 
 {#if Object.keys(data).length > 0}
-    <form method="POST"  on:submit|preventDefault={handleSubmit}>
+    <form method="POST"  on:submit|preventDefault={handleSubmit} enctype="multipart/form-data">
         {#if data.title}<h2>{data.title}</h2>{/if}
         {#each Object.entries(data) as [key, field]}
             {#if typeof field !== 'string'}
@@ -47,6 +49,7 @@
                         {/each}
                     </select>
                 {/if}
+
                 {#if field.type === 'textarea'}
                     <textarea id={key} rows={field.rows || 3} name={field.fieldName} value={field.value || ''}></textarea>
                 {/if}

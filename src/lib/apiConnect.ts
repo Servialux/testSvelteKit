@@ -1,4 +1,5 @@
 import axios from "axios";
+import fs from 'fs';
 import {API_URL} from '$env/static/private';
 
 
@@ -86,11 +87,23 @@ export const getDetails = async (cookie: string, route: string) => {
 // Post API data
 export const postItem = async (cookie: string, route: string, data: any) => {
     try{
-        const response = await axios.post(endpoint + 'api/'+route, data, {
-            headers: {  
-                Authorization: `Bearer `+cookie,
-            },
-        })
+        let myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer "+cookie);
+
+        let requestOptions: any = {
+            method: 'POST',
+            headers: myHeaders,
+            body: data,
+            redirect: 'follow'
+        };
+
+        console.log(data);
+
+        let response = await fetch("http://localhost:8000/api/admin/shops/", requestOptions)
+            .then(response => response.text())
+            .then(result => console.log(result))
+            .catch(error => console.log('error', error));
+
         return response;
     }
     catch(error: any){
