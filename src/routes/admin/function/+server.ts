@@ -1,10 +1,38 @@
 import { postItem, refreshToken } from '$lib/apiConnect';
 import type { RequestHandler } from '@sveltejs/kit';
+import fs from 'fs'
 import { request } from 'http';
+
+
+function isJson(strJson: string|Array<any>|FormDataEntryValue) {
+  try {
+    if(strJson instanceof Array){
+        strJson = JSON.stringify(strJson);
+        console.log( strJson);
+    }
+    if(strJson instanceof File){
+      return false;
+    }
+    if(strJson === null){
+      return false;
+    }
+    const parsed = JSON.parse(strJson);
+    if (parsed && typeof parsed === "object") {
+      return true;
+    }
+  } catch {
+    return false;
+  }
+  return false;
+}
 
 export const POST: RequestHandler = async (data) => {
     let body: any = {};
     let token = '';
+    let sended = new FormData();
+
+    let test: any;
+
     data.locals.user ? token = data.locals.user.token : '';
     if(token === ''){
       console.log('no token');
@@ -14,18 +42,35 @@ export const POST: RequestHandler = async (data) => {
     let logoFile = () => { if(formData.get('logoFile')){return formData.get('logoFile')}else{return ''}};
     let imageFile = () => { if(formData.get('imageFile')){return formData.get('imageFile')}else{return ''}};
     let dataSend = () => { if(formData.get('data')){return formData.get('data')}else{return ''}};
-
+    let dataSendString = dataSend();
     body = {
       logoFile: logoFile(),
       imageFile: imageFile(),
       data: dataSend(),
     }
-    let response = await postItem(token, 'admin/shops/', body);
+
+    if(logoFile() instanceof File){
+      let file: any = logoFile();
+      let streamFile: any = file.stream();
+      sended.append('logoFile', streamFile);
+    }
+
+    if(imageFile() instanceof File){
+      let file: any = imageFile();
+      let streamFile: any = file.stream();
+      sended.append('imageFile', streamFile);
+    }
+
+    if(dataSendString !== null){
+      if(isJson(dataSendString)){
+        let data: any = dataSend();
+        sended.append('data', data);
+      }
+    }
+
+    let response = await postItem(token, 'admin/shops/', sended);
     console.log(response);
-    return new Response("OK");
-   
-
-
+    return new Response(JSON.stringify({ success: true, message: "Données reçues avec succès" }))
 };
 
 // export const POST: RequestHandler = async (data) => {
