@@ -1,5 +1,14 @@
 <script lang="ts">
-    import { createEventDispatcher } from 'svelte';
+    
+import { createEventDispatcher } from 'svelte';
+import { createForm } from 'svelte-forms-lib';
+import { Form, Field } from "svelte-forms-lib";
+import { object, string, number, date } from 'yup';
+
+import shopSchema from './models/shopsValidator';
+
+import type { InferType } from 'yup';
+
     export let data: FormData = {} as FormData;
     const dispatch = createEventDispatcher();
     
@@ -21,7 +30,11 @@
         title: string;
         [key: string]: FormField | string;
     }
-
+    console.log(data);
+    // Création du schéma de validation
+    // const { form, errors, state, handleChange } = createForm({
+    //   initialValues: ,
+    // });
     // Récupération des donnés du formulaire
 	function handleSubmit(event: Event) {
         event.preventDefault();
@@ -33,7 +46,7 @@
 </script>
 
 {#if Object.keys(data).length > 0}
-    <form method="POST"  on:submit|preventDefault={handleSubmit} enctype="multipart/form-data">
+    <form id="formBuilder" method="POST"  on:submit|preventDefault={handleSubmit} enctype="multipart/form-data">
         {#if data.title}<h2>{data.title}</h2>{/if}
         {#each Object.entries(data) as [key, field]}
             {#if typeof field !== 'string'}

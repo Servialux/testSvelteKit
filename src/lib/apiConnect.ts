@@ -97,16 +97,11 @@ export const postItem = async (cookie: string, route: string, data: any) => {
             redirect: 'follow'
         };
 
-        console.log(data);
-
         let response = await fetch("http://localhost:8000/api/admin/shops/", requestOptions)
-            .then(response => response.text())
-            .then(result => console.log(result))
-            .catch(error => console.log('error', error));
-
+        
         return response;
     }
     catch(error: any){
-        return error.response.data;
+        return error;
     }
 }

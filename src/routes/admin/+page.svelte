@@ -1,11 +1,12 @@
 <script lang='ts'>
 import { onMount } from "svelte";
-import { tableMapperValues, tableSourceValues, Table } from '@skeletonlabs/skeleton';
+import { tableMapperValues, tableSourceValues, Table, getToastStore } from '@skeletonlabs/skeleton';
 import { pageTitle } from "$lib/stores/themeStore";
 import  FormBuilder  from "$lib/formBuilder.svelte";
 import Icon from '@iconify/svelte';
-import type { TableOfContents, TableSource,  } from "@skeletonlabs/skeleton";
+import type { TableOfContents, TableSource, ToastSettings,  } from "@skeletonlabs/skeleton";
 
+const toastStore = getToastStore();
 	let error: any;
     onMount(async () => {
 		pageTitle.set('Dashboard');
@@ -27,7 +28,6 @@ import type { TableOfContents, TableSource,  } from "@skeletonlabs/skeleton";
 	async function handleFormSubmit(event: any) {
 		const postData = event.detail;
 		let bodyData = new FormData();
-		console.log('postData',postData);
 		for(let key in postData) {
             if(key == 'logoFile' || key == 'imageFile') {
                 bodyData.append(key, postData[key], postData[key].name);
@@ -42,12 +42,28 @@ import type { TableOfContents, TableSource,  } from "@skeletonlabs/skeleton";
 
 		bodyData.append("data", JSON.stringify(postData));
 			try {
+				console.log('send request');
 				const res = await fetch('/admin/function/', { 
 					method: 'POST', 
 					body: bodyData
 				});
-				const data = await res.json();
-				console.log('response page',data);
+				const statusCode  =  res;
+				const response = await res.json();
+				let message:string;
+				let background: string;
+
+				if(statusCode.ok){
+					background = 'variant-filled-success';
+					message = 'Boutique créer avec succès '+response.id;
+				} else {
+					background = 'variant-filled-error';
+					message = 'Une erreur est survenue '+JSON.stringify(response); 
+				}
+				const t: ToastSettings = {
+					message: message,
+					background: background,		
+				}
+				toastStore.trigger(t);
 			} catch (error) {
 				console.error(error);
 			}
