@@ -3,10 +3,6 @@ import { redirect } from "@sveltejs/kit";
 
 import type { ServerLoadEvent } from "@sveltejs/kit";
 
-export const actions = async () =>{
-	console.log('action');
-};
-
 export async function load({ locals, cookies }: ServerLoadEvent) {
     if (!locals.user) {
         throw redirect(302, '/auth');
@@ -42,19 +38,16 @@ export async function load({ locals, cookies }: ServerLoadEvent) {
     }
     sessionInfo = result.data;
     dataSend = data.data;
-    let formCreate = await getDetails(locals.user.token, 'admin/shops/form');
 
-    //Trigger from handleFormSubmit
-    function postDetails(data: any){
-        console.log('triggered');
-        //postItem(locals.user.token, 'admin/shops/form', data);
-    };
+    let formCreate = await getDetails(locals.user.token, 'admin/shops/form');
+    let shops = await getDetails(locals.user.token, 'admin/shops/');
 
     return {
         props: {
             session: sessionInfo,
             data: dataSend,
             formCreate: formCreate.data,
+            shops: shops.data,
         }
     };
 }

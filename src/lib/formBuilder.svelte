@@ -30,7 +30,7 @@ import type { InferType } from 'yup';
         title: string;
         [key: string]: FormField | string;
     }
-    console.log(data);
+
     // Création du schéma de validation
     // const { form, errors, state, handleChange } = createForm({
     //   initialValues: ,
