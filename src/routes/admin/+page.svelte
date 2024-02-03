@@ -1,6 +1,7 @@
 <script lang='ts'>
 import { onMount } from "svelte";
 import { tableMapperValues, tableSourceValues, Table, getToastStore } from '@skeletonlabs/skeleton';
+import { goto } from '$app/navigation';
 import { redirect } from '@sveltejs/kit';
 import { pageTitle } from "$lib/stores/themeStore";
 import  FormBuilder  from "$lib/formBuilder.svelte";
@@ -37,7 +38,7 @@ import type { TableOfContents, TableSource, ToastSettings,  } from "@skeletonlab
 	}
 
 	interface MultiShopsType {
-		[key: string]: [key: ShopsType | null]
+		[key: string]: [key: ShopsType | any]
 	}
 
 	export let data;
@@ -60,7 +61,7 @@ import type { TableOfContents, TableSource, ToastSettings,  } from "@skeletonlab
 
 
 	function selectShop(id: string){
-		throw redirect(307, '/admin/shops/'+id+'/');
+		goto('/admin/shops/' + id);
 	}
 
 	function toggleCreate(){

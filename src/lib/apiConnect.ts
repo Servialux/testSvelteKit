@@ -105,3 +105,24 @@ export const postItem = async (cookie: string, route: string, data: any) => {
         return error;
     }
 }
+
+// Put API data
+export const putItem = async (cookie: string, route: string, data: any) => {
+    try{
+        let myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer "+cookie);
+
+        let requestOptions: any = {
+            method: 'PUT',
+            headers: myHeaders,
+            body: data,
+            redirect: 'follow'
+        };
+        let response = await fetch(endpoint + 'api/'+route, requestOptions)
+        
+        return response;
+    }
+    catch(error: any){
+        return error;
+    }
+}
