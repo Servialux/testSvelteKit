@@ -1,13 +1,15 @@
 import { checkLife, getDetails, refreshToken } from "$lib/apiConnect";
 import { redirect, type ServerLoadEvent } from "@sveltejs/kit";
+import {API_URL} from '$env/static/private';
 
 export async function load({ locals, cookies, params }: ServerLoadEvent){
 
+    
     let id: string = "noroute";
     if(params.id){
          id = params.id;
     }
-    
+    const endpoint = API_URL+'api/admin/shops/'+id;
     try{
         let refresh:any;
         if(!locals.user){
@@ -25,10 +27,12 @@ export async function load({ locals, cookies, params }: ServerLoadEvent){
         throw redirect(302, '/auth');
     }
     const shop = await getDetails(locals.user.token, 'admin/shops/' + id);
-
+    const bearer = locals.user.token;
     return {
         props: {
-            shop: shop.data
+            shop: shop.data,
+            endpoint: endpoint,
+            bearer: bearer,
         }
     }
 }

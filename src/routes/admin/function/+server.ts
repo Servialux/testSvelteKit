@@ -70,7 +70,7 @@ export const POST: RequestHandler = async (data) => {
     }
 
     try{
-    let response = await postItem(token, 'admin/shops/', sended)
+    let response = await postItem(token, 'api/admin/shops/', sended)
       if (response.ok) { // Si le statut est 200-299
           let responseBody = await response.json(); 
           return new Response(JSON.stringify(responseBody), {
