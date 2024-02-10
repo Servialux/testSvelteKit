@@ -20,7 +20,6 @@ export let userInfo = writable<User>(initUser);
 export function getUserStore(){
     let getUser = {};
     userInfo.subscribe((u) => getUser = u);
-    console.log(getUser);
     return {
         getUser,
     }

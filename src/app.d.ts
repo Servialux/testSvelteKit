@@ -9,6 +9,13 @@ declare namespace App {
 			refresh_token: string;
 			email: string;
 		} 
+		menuItems: { 
+			tabName: string; 
+			tabPath: string; 
+			tabSet: number; 
+			tabOpen: boolean; 
+			tabIcon: string; 
+		}[]
 	}
 	// interface PageData {}
 	// interface Error {}

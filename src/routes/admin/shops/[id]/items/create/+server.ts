@@ -1,11 +1,14 @@
 import { putItem, postItem } from "$lib/apiConnect";
 import type { RequestHandler } from "@sveltejs/kit";
 
-export const POST: RequestHandler = async (data) => {
-    if(data){
-        let token = data.locals.user ? (data.locals.user.token != null ? data.locals.user.token : '') : '';
+export const POST: RequestHandler = async ({ locals, params, request }) => {
+    if(request){
+        let token = locals.user ? (locals.user.token != null ? locals.user.token : '') : '';
         
-        let response = await postItem(token, 'api/admin/shops/'+data.params.id, data.params);
+        const data = await request.formData();
+        console.log('form',data);
+ 
+        let response = await postItem(token, 'api/admin/shops/'+params.id+'/items/', data);
         console.log(response);
         if (response.ok) { // Si le statut est 200-299
             let responseBody = await response.json(); 
@@ -14,7 +17,6 @@ export const POST: RequestHandler = async (data) => {
                 headers: { 'Content-Type': 'application/json' }
             });
         } else {
-            // Gestion des réponses d'erreur
             let errorBody = await response.text(); 
             return new Response(errorBody, {
                 status: response.status,
@@ -32,19 +34,9 @@ export const POST: RequestHandler = async (data) => {
 export const PUT: RequestHandler = async ({ locals, params, request }) => {
     let token = locals.user ? (locals.user.token != null ? locals.user.token : '') : '';
 
-    const requestBody = await request.json();
-    let response = await putItem(token, '/admin/shops/' + params.id, JSON.stringify(requestBody));
-    if (response.ok) {
-        let responseBody = await response.json();
-        return new Response(JSON.stringify(responseBody), {
-            status: response.status,
-            headers: { 'Content-Type': 'application/json' }
-        });
-    } else {
-        let errorBody = await response.text();
-        return new Response(errorBody, {
-            status: response.status,
-            headers: { 'Content-Type': 'application/json' }
-        });
-    }
+    let errorBody = 'not found';
+    return new Response(errorBody, {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' }
+    });
 };

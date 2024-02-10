@@ -66,6 +66,9 @@ import type { InferType } from 'yup';
                 {#if field.type === 'textarea'}
                     <textarea id={key} rows={field.rows || 3} name={field.fieldName} value={field.value || ''}></textarea>
                 {/if}
+                {#if field.type === 'number'}
+                    <input class="input" title={field.fieldName}  type="number" value={field.value || ''} />
+                {/if}
                 {#if field.type === 'checkbox' && field.option}
                     {#each Object.entries(field.option) as [index, option]}
                         {#each Object.entries(option) as [key, value]}

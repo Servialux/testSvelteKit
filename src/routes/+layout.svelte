@@ -1,4 +1,6 @@
 <script lang="ts">
+export let data;
+
 	import { 
 		initializeStores, 
 		AppShell, 
@@ -11,6 +13,9 @@
 		autoModeWatcher,
 		Toast,
 		Modal,
+		TabGroup,
+		Tab,
+		TabAnchor
 	} from '@skeletonlabs/skeleton';
 	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
@@ -23,9 +28,10 @@
 	import Icon from '@iconify/svelte';
 	import type { DrawerSettings } from '@skeletonlabs/skeleton';
 	import type { AfterNavigate } from '@sveltejs/kit';
+
 	//initialisation du store Skeleton
 	initializeStores();
-	
+
 	const drawerStore = getDrawerStore();
 	const drawerSettings: DrawerSettings = {
 		id: 'example-3',
@@ -53,6 +59,8 @@
 
 	}
 
+	let tabsBottomNav = 0;
+
 	function switchMenu() {
 		const currentMenuState = get(isMenuShow);
 		if (currentMenuState === 'true') {
@@ -60,7 +68,6 @@
 			hideMenu();
 		} else {
 			showMenu();
-			console.log('hide menu');
 		}
 	}
 
@@ -76,9 +83,7 @@
 		drawerStore.open(drawerSettings);
 	}
 
-	export let data: any;
 	let session = data.props.session ?? null;
-	console.log('isauthlayout:',data);
 </script>
 
 <svelte:head>{@html `<script>${autoModeWatcher.toString()} autoModeWatcher();</script>`}</svelte:head>
@@ -118,8 +123,8 @@
 		</AppBar>
 	</svelte:fragment>
 	
-	<svelte:fragment  slot="sidebarLeft">
-		<div class="absolute "  class:hidden={$isMenuShow === 'false'}>
+	<svelte:fragment slot="sidebarLeft">
+		<div class:hidden={$isMenuShow === 'false'}>
 			<AppRail>
 				<AppRailAnchor href="/" selected={$page.url.pathname === '/'}>Accueil</AppRailAnchor>
 				{#if session.auth}
@@ -146,7 +151,7 @@
 	<slot />
 
 	<svelte:fragment slot="pageFooter">
-		<div class="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
+		<div class="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between mb-20">
 				<span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2023 <a href="https://app.nhbuilder.xyz/" class="hover:underline">PayeTonMenu</a>. All Rights Reserved.
 			</span>
 			<ul class="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
@@ -166,6 +171,30 @@
 		</div>
 	</svelte:fragment>
 	<!-- (footer) -->
+	<TabGroup 
+		justify="justify-center"
+		active="variant-filled-primary"
+		hover="hover:variant-soft-primary"
+		flex="flex-1 lg:flex-none"
+		rounded=""
+		border=""
+		class="bg-surface-100-800-token w-full absolute bottom-0"
+	>
+
+	{#if data.props.menuItems != undefined}
+		{#each data.props.menuItems as item}
+			<TabAnchor href={item.tabPath} selected={$page.url.pathname === item.tabPath} class="flex flex-col items-center">
+				<svelte:fragment slot="lead" ><Icon icon={item.tabIcon} width="2.8rem" height="2.8rem" /></svelte:fragment>
+				<span class="hidden">{item.tabName}</span>
+			</TabAnchor>
+		{/each}
+		{:else}
+		<TabAnchor href="/">
+			<svelte:fragment slot="lead"></svelte:fragment>
+			<span>Erreur menu cliquer ici</span>
+		</TabAnchor>
+	{/if}
+	</TabGroup>
 </AppShell>
 
 

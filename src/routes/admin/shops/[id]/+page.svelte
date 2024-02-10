@@ -1,6 +1,26 @@
 <script lang='ts'>
-import { getToastStore, type ToastSettings } from '@skeletonlabs/skeleton';
+import { 
+    popup, 
+    getToastStore, 
+    storePopup, 
+    TreeView, 
+    TreeViewItem, 
+    RecursiveTreeView 
+} from '@skeletonlabs/skeleton';
+import { onMount } from 'svelte';
+
+import  FormBuilder  from "$lib/formBuilder.svelte";
+import { pageTitle } from "$lib/stores/themeStore";
+
+import { computePosition, autoUpdate, offset, shift, flip, arrow } from '@floating-ui/dom';
 import Icon from '@iconify/svelte';
+
+import type { PopupSettings, ToastSettings, TreeViewNode } from '@skeletonlabs/skeleton';
+
+
+  onMount(async () => {
+		pageTitle.set('Boutique');
+	});
     
     export let data: any;
 
@@ -9,13 +29,13 @@ import Icon from '@iconify/svelte';
     const bearer = data.props.bearer;
     let shop = data.props.shop;
     let endpoint = data.props.endpoint;
+    let itemForm = data.props.itemsForm;
     let headForm = false;   
     let descriptionForm = false;
     let addressForm = false;
     let typeForm = false;
+    let menuItem = false;
     let footerForm = false;
-    
-    console.log(shop);
 
     async function toggleShopStatus() {
         shop.isActive = !shop.isActive;
@@ -66,6 +86,49 @@ import Icon from '@iconify/svelte';
         console.log("footer trigger");
     }
 
+    storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
+    const toggleMenuItem: PopupSettings = {
+        event: 'click',
+        target: 'menuItem',
+        placement: 'bottom',
+    };
+    function toggledItems() {
+        menuItem = !menuItem;
+    }
+
+    async function handleCreateItem(event: any){
+        const data = event.detail;
+        const bodyData = new FormData();
+        for(let key in data) {
+            if(key == 'imageFile') {
+                bodyData.append(key, data[key], data[key].name);
+            } else {
+                if(data[key] === "1" || data[key] === "0") {
+                    data[key] = data[key] === "0";
+                } else {
+                    data[key] = data[key];
+                }
+            }
+        }
+        bodyData.append('data', JSON.stringify(data));
+        let response = await fetch(`/admin/shops/${shop.id}/items/create`, {
+            method: 'POST',
+            body: bodyData,
+        })
+        if(response.ok) {
+            let message = await response.json();
+            t = {
+                message: 'L\'article a été créé avec succès :'+ message.name,
+            };
+        } else {
+            let message = await response.text();
+            t = {
+                message: message,
+            };
+        }
+        toastStore.trigger(t);
+    }
+
     async function updateShop(){
         let response = await fetch(`/admin/shops/${shop.id}/updateShop`, {
             method: 'PUT',
@@ -94,20 +157,54 @@ import Icon from '@iconify/svelte';
         }
         toastStore.trigger(t);
     }
-
-
-    async function testFetch(){
-        let resp = await fetch('/admin/shops/1/updateShop', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({isActive: false})
-        })
-    }
-
-
 </script>
+<div class="top-24 ml-4 bg-primary-600 opacity-50 hover:opacity-100 rounded-full absolute">
+    <button use:popup={toggleMenuItem} on:click={toggledItems} class="btn flex items-center justify-center">
+        {#if menuItem}
+            <Icon icon="material-symbols:close" width="1.4em" height="1.4em" />
+        {:else}
+            <Icon icon="material-symbols:box-outline" width="1.4em" height="1.4em" />
+        {/if}
+    </button>
+    <div class="card p-4 max-w-md w-80 shadow-xl overflow-auto" data-popup="menuItem">
+        <TreeView>
+            <TreeViewItem >
+                Produits
+                <svelte:fragment slot="children">
+                    <TreeViewItem>
+                        Créer un article
+                        <svelte:fragment slot="children">
+                        {#if Object.keys(itemForm).length > 0}
+                            <FormBuilder data={itemForm} on:submit={handleCreateItem} />
+                        {/if}
+                        </svelte:fragment>
+                    </TreeViewItem>
+                    <TreeViewItem>
+                        <a href="/admin/shops/{shop.id}/items" >Voir et gérer les articles</a>
+                    </TreeViewItem>
+                    <TreeViewItem>
+                        Importer des Articles 
+                    </TreeViewItem>
+                </svelte:fragment>
+            </TreeViewItem>
+            <TreeViewItem>
+                Saveurs
+                <svelte:fragment slot="children">
+                    <TreeViewItem>
+                        Créer une saveur
+                    </TreeViewItem>
+                    <TreeViewItem>
+                        Voir et gérer les saveurs
+                    </TreeViewItem>
+                    <TreeViewItem>
+                        Importer des saveurs
+                    </TreeViewItem>
+                </svelte:fragment>
+            </TreeViewItem>
+        </TreeView>
+        <div class="arrow bg-surface-100-800-token" />
+    </div>
+</div>
 <div class="card">
     <div  class="flex flex-col items-center mt-2">
         {#if shop.isActive}
@@ -117,14 +214,21 @@ import Icon from '@iconify/svelte';
                 <button type="button" class="btn variant-ghost-success mt-2" on:click={toggleShopStatus}>
                     <strong class="text-success-500">En ligne</strong>
                 </button>
+                <button type="button" class="btn variant-soft mt-2" on:click={toggleShopStatus}>
+                    <strong class="text-slate-500">Hors Ligne</strong>
+                </button>
             </div>
         {:else}
             <p class="text-center font-bold h-full flex-grow mt-1">La boutique est:  </p>
             <div class="flex items-center gap-2">
                 <!-- <Icon icon="icon-park-solid:press" width="1.2rem" height="1.2rem" /> -->
+                <button type="button" class="btn variant-soft mt-2" on:click={toggleShopStatus}>
+                    <strong class="text-slate-500">En ligne</strong>
+                </button>
                 <button type="button" class="btn variant-ghost-warning mt-2" on:click={toggleShopStatus}>
                     <strong class="text-warning-500">Hors Ligne</strong>
                 </button>
+
             </div>
         {/if}
     </div>

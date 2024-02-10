@@ -44,7 +44,6 @@ export const checkLife = async (cookie: string) => {
         return res;
     }catch(error: any){
         let response = {'code': 0,'message': ''};
-        console.log(response)
         if(response.message){
             response.code = error.response.data.statusCode;
             response.message = error.response.data.data.message;
@@ -111,7 +110,6 @@ export const putItem = async (cookie: string, route: string, data: any) => {
     try{
         let myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer "+cookie);
-        console.log(route);
         let requestOptions: any = {
             method: 'PUT',
             headers: myHeaders,

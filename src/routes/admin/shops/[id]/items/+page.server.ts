@@ -9,7 +9,7 @@ export async function load({ locals, cookies, params }: ServerLoadEvent){
     if(params.id){
          id = params.id;
     }
-    const endpoint = API_URL+'api/admin/shops/'+id;
+    const endpoint = API_URL+'api/admin/shops/'+id+'/items';
     try{
         let refresh:any;
         if(!locals.user){
@@ -26,13 +26,13 @@ export async function load({ locals, cookies, params }: ServerLoadEvent){
     }catch(error: any){
         throw redirect(302, '/auth');
     }
-    const shop = await getDetails(locals.user.token, 'admin/shops/' + id);
+    const items = await getDetails(locals.user.token, 'admin/shops/' + id + '/items');
     const itemsForm = await getDetails(locals.user.token, 'admin/shops/' + id + '/items/form');
     const bearer = locals.user.token;
 
     return {
         props: {
-            shop: shop.data,
+            items: items.data,
             endpoint: endpoint,
             bearer: bearer,
             itemsForm: itemsForm.data
